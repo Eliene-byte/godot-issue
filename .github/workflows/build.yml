@@ -24,13 +24,13 @@ jobs:
         run: |
           $EXE = Get-ChildItem -Path bin/*.exe | Select-Object -First 1
           if ($EXE) {
-            & $EXE.FullName --generate-mono-glue modules/mono/glue
+            & $EXE.FullName --headless --generate-mono-glue modules/mono/glue
           } else {
             Write-Error "Executavel nao encontrado na pasta bin!"
           }
 
       - name: Compilar Final (Fase 2)
-        run: scons p=windows target=editor module_mono=yes d3d12=no -j 2
+        run: scons p=windows target=editor module_mono=yes d3d12=no -j 4
 
       - name: Upload do Executavel
         uses: actions/upload-artifact@v4

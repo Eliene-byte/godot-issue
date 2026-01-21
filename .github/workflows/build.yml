@@ -1,0 +1,32 @@
+name: Build Godot com Bypass
+on: [push]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Instalar SCons
+        run: pip install scons
+
+      - name: Compilar Editor (Fase 1)
+        run: scons p=windows target=editor module_mono=yes d3d12=no -j 2
+
+      - name: Gerar Glue
+        run: bin/godot.windows.editor.x86_64.mono.exe --generate-mono-glue modules/mono/glue
+
+      - name: Compilar Final (Fase 2)
+        run: scons p=windows target=editor module_mono=yes d3d12=no -j 2
+
+      - name: Upload do Executavel
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-com-bypass
+          path: bin/

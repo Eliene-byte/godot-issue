@@ -16,7 +16,7 @@ jobs:
       - name: Instalar SCons
         run: pip install scons
 
-      - name: Compilar Editor Fase 1
+      - name: Compilar Fase 1
         run: scons p=windows target=editor module_mono=yes mono_glue=no d3d12=no -j 3
 
       - name: Gerar Glue
@@ -29,10 +29,10 @@ jobs:
             Write-Error "Executavel nao encontrado na pasta bin!"
           }
 
-      - name: Compilar Final Fase 2
+      - name: Compilar Final
         run: scons p=windows target=editor module_mono=yes d3d12=no -j 3
 
-      - name: Upload do Executavel
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: godot-com-bypass

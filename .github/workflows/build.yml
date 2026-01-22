@@ -16,8 +16,8 @@ jobs:
       - name: Instalar SCons
         run: pip install scons
 
-      - name: Compilar Fase 1
-        run: scons p=windows target=editor module_mono=yes mono_glue=no d3d12=no vcvars_msvc_top="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" -j 3
+      - name: Compilar Editor Fase 1
+        run: scons p=windows target=editor module_mono=yes mono_glue=no d3d12=no -j 3
 
       - name: Gerar Glue
         shell: pwsh
@@ -25,12 +25,14 @@ jobs:
           $EXE = Get-ChildItem -Path bin/*.exe | Select-Object -First 1
           if ($EXE) {
             & $EXE.FullName --headless --generate-mono-glue modules/mono/glue
+          } else {
+            Write-Error "Executavel nao encontrado na pasta bin!"
           }
 
-      - name: Compilar Final
+      - name: Compilar Final Fase 2
         run: scons p=windows target=editor module_mono=yes d3d12=no -j 3
 
-      - name: Upload
+      - name: Upload do Executavel
         uses: actions/upload-artifact@v4
         with:
           name: godot-com-bypass

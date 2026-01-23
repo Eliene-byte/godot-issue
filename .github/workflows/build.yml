@@ -16,8 +16,18 @@ jobs:
       - name: Instalar SCons
         run: pip install scons
 
-      - name: Compilar Tudo (Fluxo Unico)
-        # Este comando tenta gerar o glue internamente sem precisar rodar o exe separado
+      - name: Compilar Editor (Fase 1)
+        # Compila o básico primeiro para podermos gerar o glue
+        run: scons p=windows target=editor module_mono=yes d3d12=no -j 3
+
+      - name: Gerar Glue Codes (Bypass Máquina Cega)
+        # Este é o segredo para não travar: headless + drivers dummy
+        run: |
+          $GODOT_EXE = Get-ChildItem -Path bin/ -Filter "*.exe" | Select-Object -First 1
+          & $($GODOT_EXE.FullName) --headless --audio-driver Dummy --display-driver Dummy --generate-mono-glue modules/mono/glue
+
+      - name: Compilar Tudo (Fase 2 - Final)
+        # Agora compila com os glues gerados
         run: scons p=windows target=editor module_mono=yes d3d12=no -j 3
 
       - name: Upload

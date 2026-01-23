@@ -19,17 +19,18 @@ jobs:
       - name: Compilar Editor (Fase 1)
         run: scons p=windows target=editor module_mono=yes d3d12=no -j 3
 
-      - name: Gerar Glue Codes (Modo Headless Certeiro)
+      - name: Gerar Glue Codes (Bypass Máquina Cega)
         run: |
           $GODOT_EXE = Get-ChildItem -Path bin/ -Filter "*.exe" | Select-Object -First 1
-          Write-Host "Usando executável: $($GODOT_EXE.FullName)"
-          & $($GODOT_EXE.FullName) --headless --audio-driver Dummy --generate-mono-glue modules/mono/glue
+          Write-Host "Iniciando Geração de Glue Force com Safe-Mode..."
+          # O segredo está no --quit e no --no-window para evitar o travamento que você teve
+          & $($GODOT_EXE.FullName) --headless --generate-mono-glue modules/mono/glue --quit --no-window --audio-driver Dummy
 
       - name: Compilar Tudo (Fase 2 - Final)
         run: scons p=windows target=editor module_mono=yes d3d12=no -j 3
 
-      - name: Upload
+      - name: Upload do Artefato
         uses: actions/upload-artifact@v4
         with:
-          name: godot-com-bypass
+          name: godot-com-bypass-final
           path: bin/
